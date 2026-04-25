@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SparkleCare – Premium Cleaning Services</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; overflow:hidden; touch-action:none; font-family:'DM Sans',sans-serif; background:#0d1f3c; color:#fff; }
+
+    :root {
+      --navy: #0d1f3c;
+      --blue: #1d4ed8;
+      --teal: #0ea5e9;
+      --cyan: #22d3ee;
+      --green: #25D366;
+      --gold: #f59e0b;
+      --muted: rgba(255,255,255,0.6);
+      --card: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.12);
+    }
+
+    /* ── PROGRESS ── */
+    #progress-track { position:fixed; top:0; left:0; right:0; height:3px; background:rgba(255,255,255,0.1); z-index:500; }
+    #progress-fill  { height:100%; background:linear-gradient(90deg,var(--teal),var(--cyan)); transition:width 0.4s cubic-bezier(0.22,1,0.36,1); box-shadow:0 0 10px var(--cyan); }
+
+    /* ── DOT NAV ── */
+    #dot-nav { position:fixed; bottom:1rem; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:500; }
+    #dot-nav span { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.3); display:block; cursor:pointer; transition:all 0.3s; }
+    #dot-nav span.on { width:22px; border-radius:4px; background:var(--cyan); box-shadow:0 0 8px var(--cyan); }
+
+    /* ── SLIDER ── */
+    #slider-track {
+      display:flex; width:300%; height:100%;
+      will-change:transform;
+      transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);
+    }
+    .slide {
+      width:33.3333%; flex-shrink:0; height:100%;
+      display:flex; flex-direction:column;
+      align-items:center;
+      position:relative;
+      padding:3rem 1.5rem 5rem;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    /* ── SLIDE BG ── */
+    .slide-1 { background:radial-gradient(ellipse 90% 80% at 50% 20%, #1a3560 0%, #0d1f3c 70%); }
+    .slide-2 { background:linear-gradient(170deg,#0d2447 0%,#0b1a35 100%); }
+    .slide-3 { background:radial-gradient(ellipse 90% 70% at 50% 90%, #0e2a52 0%, #0d1f3c 70%); }
+
+    /* ── LOGO RING ── */
+    .logo-ring {
+      position:relative; display:inline-block;
+      padding:4px; border-radius:50%; margin-bottom:1.6rem;
+    }
+    .logo-ring::before {
+      content:''; position:absolute; inset:-3px; border-radius:50%;
+      background:conic-gradient(from 0deg,var(--cyan),var(--blue),var(--teal),var(--cyan));
+      animation:spinRing 4s linear infinite; z-index:0;
+    }
+    .logo-ring::after {
+      content:''; position:absolute; inset:2px; border-radius:50%;
+      background:#0d1f3c; z-index:1;
+    }
+    .logo-ring img {
+      position:relative; z-index:2; display:block;
+      width:90px; height:90px; object-fit:contain; border-radius:50%;
+      animation:floatY 3.5s ease-in-out infinite;
+      filter:drop-shadow(0 0 16px rgba(14,165,233,0.5));
+    }
+    @keyframes spinRing { to { transform:rotate(360deg); } }
+    @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+
+    /* ── PILL ── */
+    .pill { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:50px; padding:5px 14px; font-size:.75rem; font-weight:600; letter-spacing:.07em; text-transform:uppercase; margin-bottom:1rem; }
+    .pill .dot { width:6px; height:6px; background:var(--cyan); border-radius:50%; animation:blink 1.6s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── TYPOGRAPHY ── */
+    .t-display { font-family:'Syne',sans-serif; font-weight:800; line-height:1.05; letter-spacing:-.02em; }
+    .t-heading  { font-family:'Syne',sans-serif; font-weight:700; }
+    .t-muted    { color:var(--muted); }
+
+    /* ── STATS ── */
+    .stats { display:flex; gap:8px; width:100%; margin-top:1.2rem; }
+    .stat  { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+    .stat-n { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; background:linear-gradient(135deg,var(--cyan),#fff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .stat-l { font-size:.65rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-top:2px; }
+
+    /* ── JANITOR ── */
+    .janitor-wrap { position:relative; width:100%; max-width:240px; margin:0 auto 1.2rem; }
+    .janitor-wrap img { width:100%; object-fit:contain; filter:drop-shadow(0 12px 30px rgba(14,165,233,0.3)); display:block; }
+    .badge { position:absolute; top:10px; right:-6px; background:linear-gradient(135deg,var(--gold),#f97316); border-radius:12px; padding:6px 10px; font-size:.68rem; font-weight:700; text-align:center; line-height:1.35; box-shadow:0 4px 14px rgba(245,158,11,.45); transform:rotate(3deg); }
+
+    /* ── FEATURES ── */
+    .feat { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:11px 14px; margin-bottom:8px; }
+    .feat-ico { width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(37,99,235,.25)); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+    .feat-t { font-size:.88rem; font-weight:600; }
+    .feat-s { font-size:.73rem; color:var(--muted); margin-top:1px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      width:100%; border:none; border-radius:15px; padding:15px 20px;
+      font-family:'DM Sans',sans-serif; font-size:.95rem; font-weight:600;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px;
+      text-decoration:none; transition:all .22s ease;
+    }
+    .btn:active { transform:scale(.96); }
+    .btn-teal  { background:linear-gradient(135deg,var(--teal),var(--blue)); color:#fff; box-shadow:0 4px 20px rgba(14,165,233,.35); }
+    .btn-blue  { background:linear-gradient(135deg,#1d4ed8,#2563eb); color:#fff; box-shadow:0 4px 20px rgba(37,99,235,.3); }
+    .btn-wa    { background:linear-gradient(135deg,#25D366,#128C7E); color:#fff; box-shadow:0 4px 20px rgba(37,211,102,.3); }
+    .btn-ghost { background:var(--card); border:1px solid var(--border); color:#fff; }
+
+    /* ── NEXT BAR ── */
+    .next-bar {
+      position:absolute; bottom:0; left:0; right:0;
+      padding:.9rem 1.4rem 1.4rem;
+      background:linear-gradient(to top, rgba(13,31,60,1) 55%, transparent);
+      display:flex; gap:12px; align-items:center; z-index:10;
+    }
+    .btn-next { flex:1; background:linear-gradient(135deg,var(--teal),var(--blue)); color:#fff; border:none; border-radius:15px; padding:15px 20px; font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .22s; box-shadow:0 4px 20px rgba(14,165,233,.4); }
+    .btn-next:active { transform:scale(.96); }
+    .skip-btn { background:none; border:none; color:var(--muted); font-size:.85rem; font-weight:500; cursor:pointer; padding:4px 6px; white-space:nowrap; }
+
+    /* ── FLOATING WA ── */
+    #fab { position:fixed; bottom:1.6rem; right:1.4rem; width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#25D366,#128C7E); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(37,211,102,.5); z-index:600; cursor:pointer; text-decoration:none; transition:transform .25s,box-shadow .25s; animation:fabIn .5s cubic-bezier(.34,1.56,.64,1) 1s both; }
+    #fab:hover  { transform:scale(1.1); }
+    #fab:active { transform:scale(.92); }
+    @keyframes fabIn { from{transform:scale(0) rotate(-45deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
+
+    /* ── MODAL ── */
+    .modal { display:none; position:fixed; inset:0; background:rgba(6,18,38,.88); backdrop-filter:blur(12px); z-index:700; align-items:flex-end; justify-content:center; }
+    .modal.open { display:flex; }
+    .sheet { background:#0f2244; border:1px solid var(--border); border-radius:24px 24px 0 0; padding:1.4rem 1.4rem 2rem; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; animation:sheetUp .35s cubic-bezier(.22,1,.36,1); }
+    @keyframes sheetUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+    .handle { width:40px; height:4px; background:rgba(255,255,255,.2); border-radius:2px; margin:0 auto 1.2rem; }
+    .modal-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1.35rem; margin-bottom:.25rem; }
+    .modal-sub   { color:var(--muted); font-size:.82rem; margin-bottom:1.2rem; }
+
+    /* ── SERVICES LIST ── */
+    .svc { display:flex; align-items:center; gap:13px; padding:13px 0; border-bottom:1px solid rgba(255,255,255,.07); cursor:pointer; }
+    .svc:last-child { border-bottom:none; }
+    .svc:active { opacity:.7; }
+    .svc-ico { width:44px; height:44px; border-radius:13px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+    .svc-n { font-weight:600; font-size:.9rem; }
+    .svc-d { font-size:.75rem; color:var(--muted); margin-top:2px; }
+
+    /* ── FORM ── */
+    .f-group { margin-bottom:13px; }
+    .f-label { display:block; font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:5px; }
+    .f-input { width:100%; background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:12px; padding:12px 15px; color:#fff; font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none; transition:border-color .2s; -webkit-appearance:none; appearance:none; }
+    .f-input:focus { border-color:var(--cyan); }
+    .f-input option { background:#0f2244; color:#fff; }
+
+    .loc-row { display:flex; gap:8px; align-items:stretch; }
+    .loc-row .f-input { flex:1; }
+    .loc-btn { flex-shrink:0; background:linear-gradient(135deg,var(--teal),var(--blue)); border:none; border-radius:12px; padding:0 14px; color:#fff; font-size:.78rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; white-space:nowrap; transition:all .2s; }
+    .loc-btn:active { transform:scale(.95); }
+
+    /* ── INCLUDE LIST ── */
+    .inc-item { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.06); font-size:.85rem; }
+    .inc-item:last-child { border-bottom:none; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .fu  { animation:fadeUp .5s ease both; }
+    .fu2 { animation-delay:.12s; }
+    .fu3 { animation-delay:.22s; }
+    .fu4 { animation-delay:.32s; }
+  </style>
+</head>
+<body>
+
+<!-- Progress -->
+<div id="progress-track"><div id="progress-fill" style="width:33.33%"></div></div>
+
+<!-- Dot nav -->
+<div id="dot-nav">
+  <span class="on" data-i="0"></span>
+  <span data-i="1"></span>
+  <span data-i="2"></span>
+</div>
+
+<!-- FAB WhatsApp -->
+<a id="fab" href="https://wa.me/0537663027?text=Hello SparkleCare!" target="_blank" title="Chat on WhatsApp">
+  <svg width="25" height="25" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+
+<!-- ═══════════════════ SLIDER ═══════════════════ -->
+<div id="slider-track">
+
+  <!-- ── SLIDE 1: INTRO ── -->
+  <div class="slide slide-1">
+    <div style="position:absolute;width:300px;height:300px;top:-80px;right:-80px;background:radial-gradient(circle,rgba(37,99,235,.2),transparent 70%);border-radius:50%;pointer-events:none;"></div>
+    <div style="position:absolute;width:220px;height:220px;bottom:100px;left:-60px;background:radial-gradient(circle,rgba(14,165,233,.15),transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+    <div style="position:relative;z-index:1;text-align:center;width:100%;max-width:340px;">
+
+      <!-- Logo -->
+      <div class="fu" style="display:flex;justify-content:center;">
+        <div class="logo-ring">
+          <img id="logo-img" src="sparkleIconTitle.png" alt="SparkleCare Logo">
+        </div>
+      </div>
+
+      <div class="pill fu fu2"><span class="dot"></span>Premium Cleaning</div>
+
+      <h1 class="t-display fu fu3" style="font-size:clamp(2.1rem,8vw,2.9rem);margin-bottom:.8rem;">
+        SparkleCare<br>
+        <span style="background:linear-gradient(120deg,var(--teal),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Cleaning Services</span>
+      </h1>
+
+      <p class="t-muted fu fu4" style="font-size:.9rem;line-height:1.65;max-width:280px;margin:0 auto 1.4rem;">
+        Professional, trusted cleaning for homes &amp; offices — delivered by vetted experts.
+      </p>
+
+      <div class="stats fu fu4">
+        <div class="stat"><div class="stat-n">500+</div><div class="stat-l">Clients</div></div>
+        <div class="stat"><div class="stat-n">98%</div><div class="stat-l">Satisfaction</div></div>
+        <div class="stat"><div class="stat-n">5yrs</div><div class="stat-l">Experience</div></div>
+      </div>
+
+    </div>
+
+    <div class="next-bar">
+      <button class="btn-next" onclick="nextPage()">
+        Get Started
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button class="skip-btn" onclick="goTo(2)">Skip</button>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 2: TRUST ── -->
+  <div class="slide slide-2">
+    <div style="position:absolute;width:260px;height:260px;top:-60px;left:-80px;background:radial-gradient(circle,rgba(14,165,233,.12),transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+    <div style="position:relative;z-index:1;width:100%;max-width:340px;">
+
+      <!-- Janitor image -->
+      <div class="janitor-wrap fu">
+        <img id="janitor-img" src="sparklecleanJanitor.png" alt="SparkleCare Professional Cleaner">
+        <div class="badge">&#11088; Verified<br>Pro</div>
+      </div>
+
+      <h2 class="t-heading fu fu2" style="font-size:clamp(1.55rem,5.5vw,2rem);margin-bottom:.5rem;">
+        Trusted by <span style="color:var(--cyan);">500+ clients</span>
+      </h2>
+      <p class="t-muted fu fu3" style="font-size:.85rem;line-height:1.65;margin-bottom:1.2rem;">
+        Every cleaner is background-checked, insured, and trained to deliver a spotless result — every time.
+      </p>
+
+      <div class="fu fu4">
+        <div class="feat">
+          <div class="feat-ico">&#9989;</div>
+          <div><div class="feat-t">Background-Checked Staff</div><div class="feat-s">Every team member is fully vetted</div></div>
+        </div>
+        <div class="feat">
+          <div class="feat-ico">&#128274;</div>
+          <div><div class="feat-t">Insured &amp; Bonded</div><div class="feat-s">Your property is always protected</div></div>
+        </div>
+        <div class="feat">
+          <div class="feat-ico">&#11088;</div>
+          <div><div class="feat-t">98% Satisfaction Rate</div><div class="feat-s">5 years of 5-star service</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-bar">
+      <button class="btn-next" onclick="nextPage()">
+        Continue
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 3: ACTIONS ── -->
+  <div class="slide slide-3" style="justify-content:center;">
+    <div style="position:absolute;width:260px;height:260px;bottom:-60px;right:-60px;background:radial-gradient(circle,rgba(37,99,235,.18),transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+    <div style="position:relative;z-index:1;width:100%;max-width:360px;">
+      <div class="pill fu"><span class="dot"></span>Ready to sparkle?</div>
+      <h2 class="t-heading fu fu2" style="font-size:clamp(1.65rem,6vw,2rem);margin-bottom:.45rem;">
+        How can we<br><span style="color:var(--cyan);">help you today?</span>
+      </h2>
+      <p class="t-muted fu fu3" style="font-size:.83rem;margin-bottom:1.5rem;">Choose an option below to get started.</p>
+
+      <div class="fu fu4" style="display:flex;flex-direction:column;gap:11px;">
+        <button class="btn btn-teal" onclick="openModal('modal-services')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          View Our Services
+        </button>
+        <button class="btn btn-blue" onclick="openModal('modal-booking')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Book a Service
+        </button>
+        <a class="btn btn-wa" href="https://wa.me/0537663027?text=Hi%20SparkleCare!%20I'd%20like%20to%20inquire%20about%20your%20services." target="_blank">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Chat on WhatsApp
+        </a>
+      </div>
+
+      <p class="t-muted" style="font-size:.74rem;text-align:center;margin-top:1.1rem;">We reply within 5 minutes during business hours</p>
+    </div>
+  </div>
+
+</div><!-- /slider-track -->
+
+
+<!-- ═══════════════ MODAL: SERVICES ═══════════════ -->
+<div class="modal" id="modal-services">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="modal-title">Our Services</div>
+    <div class="modal-sub">Tap a service to see details & pricing</div>
+
+    <div class="svc" onclick="showDetail('office')">
+      <div class="svc-ico" style="background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.25));">🏢</div>
+      <div style="flex:1"><div class="svc-n">Office & Shop Cleaning</div><div class="svc-d">Small to medium spaces</div></div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <div class="svc" onclick="showDetail('postevent')">
+      <div class="svc-ico" style="background:linear-gradient(135deg,rgba(236,72,153,.2),rgba(244,114,182,.2));">🎉</div>
+      <div style="flex:1"><div class="svc-n">Post-Event Cleanup</div><div class="svc-d">Parties, birthdays, weddings</div></div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <div class="svc" onclick="showDetail('addon')">
+      <div class="svc-ico" style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(52,211,153,.2));">➕</div>
+      <div style="flex:1"><div class="svc-n">Optional Add-On Services</div><div class="svc-d">Fridge, cooker, windows & more</div></div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <div class="svc" onclick="showDetail('moveinout')">
+      <div class="svc-ico" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(251,191,36,.2));">🏠</div>
+      <div style="flex:1"><div class="svc-n">Move-In / Move-Out</div><div class="svc-d">Deep clean for property handover</div></div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <div class="svc" onclick="showDetail('home')">
+      <div class="svc-ico" style="background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(37,99,235,.25));">🏡</div>
+      <div style="flex:1"><div class="svc-n">Home Cleaning</div><div class="svc-d">Regular & deep residential clean</div></div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <div style="margin-top:1.3rem;display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-blue" onclick="closeModal('modal-services');openModal('modal-booking')">
+        Book a Service
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-services')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL: SERVICE DETAIL ═══════════════ -->
+<div class="modal" id="modal-detail">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div id="d-icon" style="font-size:3rem;text-align:center;margin-bottom:.8rem;"></div>
+    <div class="modal-title" id="d-title"></div>
+    <div class="modal-sub"   id="d-sub"></div>
+    <p id="d-body" style="font-size:.86rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;"></p>
+
+    <div style="margin-bottom:.8rem;">
+      <div style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.5rem;">What's included</div>
+      <div id="d-list"></div>
+    </div>
+
+    <div id="d-price" style="display:inline-block;background:linear-gradient(135deg,rgba(14,165,233,.2),rgba(37,99,235,.2));border:1px solid rgba(14,165,233,.3);border-radius:50px;padding:6px 18px;font-size:.82rem;font-weight:600;margin-bottom:1.2rem;"></div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-blue" id="d-book-btn">Book This Service</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-detail');openModal('modal-services')">&#8592; Back to Services</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL: BOOKING ═══════════════ -->
+<div class="modal" id="modal-booking">
+  <div class="sheet">
+    <div class="handle"></div>
+
+    <div id="bk-form">
+      <div class="modal-title">Book a Service</div>
+      <div class="modal-sub">Fill in your details — we'll confirm via WhatsApp</div>
+
+      <div class="f-group">
+        <label class="f-label">Your Name</label>
+        <input class="f-input" id="bk-name" type="text" placeholder="e.g. Ama Owusu">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Phone Number</label>
+        <input class="f-input" id="bk-phone" type="tel" placeholder="e.g. 0244 123 456">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Service Type</label>
+        <select class="f-input" id="bk-service">
+          <option value="">Select a service…</option>
+          <option>Home Cleaning</option>
+          <option>Office Cleaning</option>
+          <option>Upholstery &amp; Carpet</option>
+          <option>Window Cleaning</option>
+          <option>Move In / Move Out</option>
+          <option>Post-Construction</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Preferred Date</label>
+        <input class="f-input" id="bk-date" type="date">
+      </div>
+
+      <!-- Location -->
+      <div class="f-group">
+        <label class="f-label">&#128205; Your Location / Address</label>
+        <div class="loc-row">
+          <input class="f-input" id="bk-loc" type="text" placeholder="Type address or use GPS">
+          <button class="loc-btn" onclick="getGPS()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+            Use GPS
+          </button>
+        </div>
+        <div id="loc-msg" style="font-size:.72rem;color:var(--cyan);margin-top:4px;min-height:14px;"></div>
+      </div>
+
+      <div class="f-group">
+        <label class="f-label">Additional Notes (optional)</label>
+        <textarea class="f-input" id="bk-notes" rows="2" placeholder="Any special instructions…" style="resize:none;"></textarea>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:.4rem;">
+        <button class="btn btn-wa" onclick="submitBooking()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Send via WhatsApp
+        </button>
+        <button class="btn btn-ghost" onclick="closeModal('modal-booking')">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div id="bk-success" style="display:none;text-align:center;padding:1.5rem 0;">
+      <div style="width:64px;height:64px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="modal-title" style="margin-bottom:.4rem;">Request Sent!</div>
+      <p class="t-muted" style="font-size:.85rem;line-height:1.6;margin-bottom:1.4rem;">Opening WhatsApp with your booking details. We'll confirm your appointment shortly!</p>
+      <button class="btn btn-ghost" onclick="resetBooking()">Make Another Booking</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ SCRIPT ═══════════════ -->
+<script>
+  // ── IMAGE FALLBACKS ─────────────────────────────
+  document.getElementById('logo-img').onerror = function() {
+    this.onerror = null;
+    this.parentElement.innerHTML =
+      '<div style="width:110px;height:110px;background:linear-gradient(135deg,#0ea5e9,#1d4ed8);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:2;">' +
+      '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>' +
+      '</div>';
+  };
+  document.getElementById('janitor-img').onerror = function() {
+    this.onerror = null;
+    this.style.display = 'none';
+    this.parentElement.insertAdjacentHTML('afterbegin',
+      '<div style="height:200px;background:linear-gradient(135deg,rgba(14,165,233,.15),rgba(37,99,235,.15));border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:.5rem;font-size:5rem;">&#129529;</div>'
+    );
+  };
+
+  // ── SLIDER STATE ────────────────────────────────
+  const track  = document.getElementById('slider-track');
+  const pfill  = document.getElementById('progress-fill');
+  const dots   = document.querySelectorAll('#dot-nav span');
+  const TOTAL  = 3;
+  let page     = 0;
+  let startX=0, curX=0, startT=0, vel=0;
+  let dragging=false, mouseDown=false;
+  let autoTimer=null, autoOn=true;
+
+  function syncUI() {
+    pfill.style.width = ((page+1)/TOTAL*100) + '%';
+    dots.forEach((d,i) => d.classList.toggle('on', i===page));
+  }
+
+  function snap(p) {
+    track.style.transform = 'translateX(-' + (p*33.3333) + '%)';
+  }
+
+  function goTo(p) {
+    stopAuto();
+    page = Math.max(0, Math.min(TOTAL-1, p));
+    track.style.transition = 'transform 0.38s cubic-bezier(0.22,1,0.36,1)';
+    snap(page); syncUI();
+  }
+
+  function nextPage() { goTo(page+1); }
+  function prevPage() { goTo(page-1); }
+
+  // ── TOUCH ───────────────────────────────────────
+  function handleTouchStart(e) {
+    const t = e.touches[0];
+    startX=t.clientX; curX=t.clientX; startT=Date.now(); vel=0;
+    dragging=true;
+    track.style.transition='none';
+    stopAuto();
+  }
+  function handleTouchMove(e) {
+    if(!dragging) return;
+    curX = e.touches[0].clientX;
+    const dx = curX - startX;
+    const pct = -(page*33.3333) + (dx/window.innerWidth)*33.3333;
+    track.style.transform = 'translateX('+pct+'%)';
+    e.preventDefault();
+  }
+  function handleTouchEnd() {
+    if(!dragging) return;
+    dragging=false;
+    const dist = curX-startX;
+    vel = Math.abs(dist/(Date.now()-startT));
+    track.style.transition='transform 0.38s cubic-bezier(0.22,1,0.36,1)';
+    if      (dist < -50 || (vel>0.3 && dist<0)) nextPage();
+    else if (dist >  50 || (vel>0.3 && dist>0)) prevPage();
+    else snap(page);
+  }
+
+  // ── MOUSE ───────────────────────────────────────
+  function handleMouseDown(e) {
+    mouseDown=true; dragging=true;
+    startX=e.clientX; curX=e.clientX; startT=Date.now(); vel=0;
+    track.style.transition='none'; stopAuto();
+  }
+  function handleMouseMove(e) {
+    if(!mouseDown||!dragging) return;
+    curX=e.clientX;
+    const dx=curX-startX;
+    const pct=-(page*33.3333)+(dx/window.innerWidth)*33.3333;
+    track.style.transform='translateX('+pct+'%)';
+  }
+  function handleMouseUp() {
+    if(!mouseDown) return;
+    mouseDown=false;
+    const dist=curX-startX;
+    vel=Math.abs(dist/(Date.now()-startT));
+    track.style.transition='transform 0.38s cubic-bezier(0.22,1,0.36,1)';
+    if      (dist<-50||(vel>0.3&&dist<0)) nextPage();
+    else if (dist> 50||(vel>0.3&&dist>0)) prevPage();
+    else snap(page);
+    dragging=false;
+  }
+
+  // ── AUTO-SLIDE ──────────────────────────────────
+  function startAuto() {
+    autoOn=true;
+    autoTimer=setInterval(()=>{
+      if(!autoOn) return;
+      page = page<TOTAL-1 ? page+1 : 0;
+      track.style.transition='transform 0.38s cubic-bezier(0.22,1,0.36,1)';
+      snap(page); syncUI();
+    }, 4500);
+  }
+  function stopAuto() { autoOn=false; clearInterval(autoTimer); }
+
+  // ── MODALS ──────────────────────────────────────
+  function openModal(id)  { document.getElementById(id).classList.add('open'); stopAuto(); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+  });
+
+  // ── SERVICES DATA ───────────────────────────────
+  const SVC = {
+    office:    { icon:'🏢', title:'Office & Shop Cleaning', sub:'Professional cleaning for commercial spaces', body:'We service offices and shops of all sizes with flexible scheduling.', items:['Small office/shop (one-time) GHS 200 – 400','Small office/shop (monthly) GHS 600 – 1,200','Medium office (monthly) GHS 1,200 – 2,500','Desk & surface disinfection','Restroom & kitchen deep clean'], price:'From GHS 200' },
+    postevent:{ icon:'🎉', title:'Post-Event Cleanup', sub:'Clean up after your celebrations', body:'Professional cleanup after parties, birthdays, and weddings.', items:['Small house party GHS 150 – 300','Birthday / engagement GHS 250 – 500','Wedding / large event GHS 500 – 1,000+','Floor vacuuming & mopping','Waste disposal & recycling'], price:'From GHS 150' },
+    addon:    { icon:'➕', title:'Optional Add-On Services', sub:'Extra cleaning for specific areas', body:'Enhance any service with these additional options.', items:['Fridge cleaning GHS 50 – 100','Cooker / oven cleaning GHS 50 – 120','Window cleaning GHS 50 – 150','Heavy stain removal','Extra dirty areas (additional charge)'], price:'From GHS 50' },
+    moveinout:{ icon:'🏠', title:'Move-In / Move-Out Cleaning', sub:'Deep clean for property handover', body:'Comprehensive clean for landlord inspections and fresh starts.', items:['Single room GHS 120 – 200','Self-contained GHS 180 – 280','2-bedroom GHS 300 – 450','3-bedroom GHS 450 – 600','Inside cupboards, oven & fridge','Floor & skirting boards'], price:'From GHS 120' },
+    home:     { icon:'🏡', title:'Home Cleaning', sub:'Residential cleaning tailored to your needs', body:'Our home cleaning covers everything from routine tidying to intensive deep cleans.', items:['Living room dusting & vacuuming','Kitchen surfaces & appliance exterior','Bathroom scrub & sanitise','Bedroom tidying & floor mopping','Trash removal'], price:'From GHS 150' }
+  };
+
+  function showDetail(key) {
+    const s = SVC[key]; if(!s) return;
+    document.getElementById('d-icon').innerHTML  = s.icon;
+    document.getElementById('d-title').textContent = s.title;
+    document.getElementById('d-sub').textContent   = s.sub;
+    document.getElementById('d-body').textContent  = s.body;
+    document.getElementById('d-price').textContent = s.price;
+    document.getElementById('d-list').innerHTML    = s.items.map(it =>
+      `<div class="inc-item"><span style="color:var(--cyan);font-weight:700;">&#10003;</span><span>${it}</span></div>`
+    ).join('');
+    document.getElementById('d-book-btn').onclick = ()=>{
+      closeModal('modal-detail');
+      document.getElementById('bk-service').value = s.title;
+      openModal('modal-booking');
+    };
+    closeModal('modal-services');
+    openModal('modal-detail');
+  }
+
+  // ── GPS LOCATION ────────────────────────────────
+  let gpsCoords = null;
+
+  function getGPS() {
+    const msg   = document.getElementById('loc-msg');
+    const input = document.getElementById('bk-loc');
+    if(!navigator.geolocation){ msg.textContent='GPS not available on this device.'; return; }
+    msg.textContent = 'Detecting your location…';
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        gpsCoords = pos.coords;
+        input.value = gpsCoords.latitude.toFixed(5)+', '+gpsCoords.longitude.toFixed(5);
+        const mapUrl = 'https://www.google.com/maps?q='+gpsCoords.latitude+','+gpsCoords.longitude;
+        msg.innerHTML = '&#128205; Location captured! <a href="'+mapUrl+'" target="_blank" style="color:var(--cyan);text-decoration:underline;">View on map</a>';
+      },
+      () => { msg.textContent='Could not detect location. Please type your address.'; gpsCoords=null; },
+      { timeout: 9000 }
+    );
+  }
+
+  // ── BOOKING SUBMIT ──────────────────────────────
+  function submitBooking() {
+    const name    = document.getElementById('bk-name').value.trim();
+    const phone   = document.getElementById('bk-phone').value.trim();
+    const service = document.getElementById('bk-service').value;
+    const date    = document.getElementById('bk-date').value;
+    const loc     = document.getElementById('bk-loc').value.trim();
+    const notes   = document.getElementById('bk-notes').value.trim();
+
+    if(!name)    { alert('Please enter your name.'); return; }
+    if(!phone)   { alert('Please enter your phone number.'); return; }
+    if(!service) { alert('Please select a service.'); return; }
+    if(!loc)     { alert('Please enter your location or tap "Use GPS".'); return; }
+
+    let locText = loc;
+    if(gpsCoords) locText += '\nhttps://www.google.com/maps?q='+gpsCoords.latitude+','+gpsCoords.longitude;
+
+    const msg = encodeURIComponent(
+      'Hi SparkleCare! I\'d like to book a service.\n\n'+
+      'Name: '+name+'\n'+
+      'Phone: '+phone+'\n'+
+      'Service: '+service+'\n'+
+      (date ? 'Preferred Date: '+date+'\n' : '')+
+      'Location: '+locText+'\n'+
+      (notes ? 'Notes: '+notes+'\n' : '')+
+      '\nPlease confirm my booking. Thank you!'
+    );
+
+    document.getElementById('bk-form').style.display    = 'none';
+    document.getElementById('bk-success').style.display = 'block';
+    setTimeout(()=>{ window.open('https://wa.me/233244000000?text='+msg,'_blank'); }, 500);
+  }
+
+  function resetBooking() {
+    ['bk-name','bk-phone','bk-date','bk-loc','bk-notes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('bk-service').value='';
+    document.getElementById('loc-msg').textContent='';
+    gpsCoords=null;
+    document.getElementById('bk-form').style.display    = 'block';
+    document.getElementById('bk-success').style.display = 'none';
+  }
+
+  // ── DOTS ────────────────────────────────────────
+  dots.forEach(d => d.addEventListener('click', ()=>goTo(+d.dataset.i)));
+
+  // ── EVENTS ──────────────────────────────────────
+  track.addEventListener('touchstart',   handleTouchStart, {passive:false});
+  track.addEventListener('touchmove',    handleTouchMove,  {passive:false});
+  track.addEventListener('touchend',     handleTouchEnd);
+  track.addEventListener('mousedown',    handleMouseDown);
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup',   handleMouseUp);
+  track.addEventListener('contextmenu',  e=>e.preventDefault());
+
+  // ── INIT ────────────────────────────────────────
+  syncUI();
+  startAuto();
+</script>
+</body>
+</html>
